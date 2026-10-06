@@ -14,8 +14,10 @@
 ├── frontend/                 Vue 3 + Vite + TypeScript 前端（唯一运行单元）
 │   ├── src/views/            每个业务模块一个页面
 │   ├── src/api/local-service.ts   本地数据服务：列表、筛选、动作流转、导出
-│   ├── src/data/             模块元数据 / 示例数据 / localStorage 持久化
+│   ├── src/domain/           共用业务判定（渗漏返工唯一口径、值班台账联动），见 domain/README.md
+│   ├── src/data/             模块元数据 / 示例数据 / localStorage 持久化（含 v1→v2 存量迁移）
 │   ├── src/stores/           会话与筛选状态
+│   ├── scripts/              判定规则验证脚本（node --test，打包真实源码执行）
 │   └── vite.config.ts        dev server 配置（open: false，无 /api 代理）
 ├── .gitignore
 └── docker-compose.yml
@@ -68,4 +70,10 @@ npm run build
 - 字段、状态、动作与流转目标集中在 `frontend/src/data/modules.ts`；示例数据在
   `frontend/src/data/seed.ts`。
 - 状态流转只允许在 `local-service.ts` 里改，页面组件不做业务判断。
+- 渗漏水处置的渗漏程度 → 处置方式 → 返工/完工判定只有 `src/domain/leak.ts` 一份实现，
+  列表、详情、动作、另存归档、导入、值班台账全部读它；判定口径与存量数据迁移的取舍见
+  `src/domain/README.md`。
+- 判定规则回归验证：`npm run test:rules`（用 esbuild 打包 `src` 真实源码后由 node:test 执行）。
 - 想回到初始数据：清掉浏览器里 `urban-utility-tunnel:entries` 这一项，或调用 `resetModule(模块)`。
+  旧版无版本号数据会在首次打开时整库迁移到 v2（渗漏单按发现日期回填并锁定历史结论、
+  值班台账按班次归一），迁移只执行一次。

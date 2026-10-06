@@ -36,3 +36,13 @@ export type OverviewResult = {
   cards: { label: string; value: number }[]
   modules: { name: string; created: number; pending: number; abnormal: number }[]
 }
+
+/** 渗漏导入 / 登记落库后的回执：整批要么全进，要么一条都不进。 */
+export type LeakImportResult = {
+  ok: boolean
+  message: string
+  inserted: number
+  pendingCode: number
+  duplicated: number
+  errors?: string[]
+}
