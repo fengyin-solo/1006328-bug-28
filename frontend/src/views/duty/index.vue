@@ -24,6 +24,12 @@
       </span>
     </p>
 
+    <p class="status-legend leak-brief">
+      渗漏处置要情（与渗漏水处置模块同源）：待办 {{ leakBrief.待办 }} 单 ·
+      待处置 {{ leakBrief.待处置 }} · 处置中 {{ leakBrief.处置中 }} · 需返工 {{ leakBrief.需返工 }} ·
+      待补录 {{ leakBrief.待补录 }} · 本月完工 {{ leakBrief.本月完工 }}
+    </p>
+
     <form class="filter-bar" @submit.prevent="reload">
       <label v-for="field in filterFields" :key="field" class="filter-item">
         <span>{{ field }}</span>
@@ -75,10 +81,12 @@ import { computed, onMounted, ref } from 'vue'
 
 import {
   downloadEntries,
+  leakDutySummary,
   listEntries,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
+import type { LeakSummary } from '@/domain/leak-disposal'
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('duty')
@@ -92,6 +100,16 @@ const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
+const leakBrief = ref<LeakSummary>({
+  total: 0,
+  待处置: 0,
+  处置中: 0,
+  需返工: 0,
+  已完工: 0,
+  待补录: 0,
+  待办: 0,
+  本月完工: 0,
+})
 const statusSummary = computed(() =>
   statuses.map((status: string) => ({
     status,
@@ -128,6 +146,7 @@ function reload() {
     const payload = listEntries(meta.key, filters.value)
     rows.value = payload.items
     total.value = payload.total
+    leakBrief.value = leakDutySummary()
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : '运维值班交接列表读取失败'
   }

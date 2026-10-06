@@ -68,4 +68,8 @@ npm run build
 - 字段、状态、动作与流转目标集中在 `frontend/src/data/modules.ts`；示例数据在
   `frontend/src/data/seed.ts`。
 - 状态流转只允许在 `local-service.ts` 里改，页面组件不做业务判断。
+- 渗漏程度、处置方式与返工判定只有一份实现：`frontend/src/domain/leak-disposal.ts`，
+  列表、动作、另存、详情与值班台账共用；口径与取舍见 `docs/leak-disposal.md`。
+- 所有写库统一走 `frontend/src/data/local-store.ts` 的 `commit`/`transact`：先迁移补齐、
+  再整体校验、最后一次性落库，任何一步失败整笔退回。
 - 想回到初始数据：清掉浏览器里 `urban-utility-tunnel:entries` 这一项，或调用 `resetModule(模块)`。
